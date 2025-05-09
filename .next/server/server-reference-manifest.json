@@ -1,0 +1,28 @@
+{
+  "node": {
+    "4099765e8253822f7b43c7397572e843924341aec6": {
+      "workers": {
+        "app/login/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fsem%2FDocuments%2Ftimedrop-app%2Fapp%2Flogin%2Factions.ts%22%2C%5B%7B%22id%22%3A%224099765e8253822f7b43c7397572e843924341aec6%22%2C%22exportedName%22%3A%22signup%22%7D%2C%7B%22id%22%3A%2240de49966a3a6a8fb87d997cea9b2abcd5093ee452%22%2C%22exportedName%22%3A%22login%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/login/page": "action-browser"
+      }
+    },
+    "40de49966a3a6a8fb87d997cea9b2abcd5093ee452": {
+      "workers": {
+        "app/login/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fsem%2FDocuments%2Ftimedrop-app%2Fapp%2Flogin%2Factions.ts%22%2C%5B%7B%22id%22%3A%224099765e8253822f7b43c7397572e843924341aec6%22%2C%22exportedName%22%3A%22signup%22%7D%2C%7B%22id%22%3A%2240de49966a3a6a8fb87d997cea9b2abcd5093ee452%22%2C%22exportedName%22%3A%22login%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/login/page": "action-browser"
+      }
+    }
+  },
+  "edge": {},
+  "encryptionKey": "CnG4hproNJiMfNbf0GL6zYpK+y9PWUIIjMr0osgdpwk="
+}
