@@ -25,8 +25,9 @@ export default async function PrivatePage() {
 
   return (
     <>
+      <Navbar />
+
       <Container>
-        <Navbar />
         <p>Hello {authData.user.email}</p>
         {festivals.map((festival) => {
           const start = new Date(festival.start_date);

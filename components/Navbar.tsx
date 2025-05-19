@@ -7,10 +7,10 @@ import {
   Divider,
   Drawer,
   Group,
+  Image,
   ScrollArea,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { MantineLogo } from "@mantinex/mantine-logo";
 import classes from "./Navbar.module.css";
 import Link from "next/link";
 
@@ -22,10 +22,10 @@ export function Navbar() {
     <Box pb={30}>
       <header className={classes.header}>
         <Group justify="space-between" h="100%">
-          <MantineLogo size={30} />
+          <Image src="/logo.png" alt="Logo" w={130} />
 
           <Group h="100%" gap={0} visibleFrom="sm">
-            <Link href="#" className={classes.link}>
+            <Link href="/dashboard" className={classes.link}>
               Dashboard
             </Link>
           </Group>
@@ -49,7 +49,7 @@ export function Navbar() {
         onClose={closeDrawer}
         size="100%"
         padding="md"
-        title="Navigation"
+        title="TimeDrop"
         hiddenFrom="sm"
         zIndex={1000000}
       >

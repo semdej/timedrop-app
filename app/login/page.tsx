@@ -1,11 +1,17 @@
 "use client";
 
-import { AuthModule } from "./AuthModule"; // Import your component here
+import { Navbar } from "@/components/Navbar";
+import { AuthModule } from "./AuthModule";
+import { Container } from "@mantine/core";
 
 export default function LoginPage() {
   return (
-    <div>
-      <AuthModule />
-    </div>
+    <>
+      <Navbar />
+
+      <Container>
+        <AuthModule />
+      </Container>
+    </>
   );
 }
