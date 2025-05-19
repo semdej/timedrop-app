@@ -6,19 +6,18 @@ import { Title, Text, Box, Divider, Container } from "@mantine/core";
 import { Navbar } from "@/components/Navbar";
 import { ClientStageSchedule } from "@/components/ClientStageSchedule";
 
-type Props = {
-  params: {
-    slug: string;
-  };
-};
-
-export default async function FestivalPage({ params }: Props) {
+export default async function FestivalPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
   const supabase = await createClient();
+  const paramsSlug = params.slug;
 
   const { data: festival, error: festErr } = await supabase
     .from("festivals")
     .select("*")
-    .eq("slug", params.slug)
+    .eq("slug", paramsSlug) // ✅ this is valid
     .single();
 
   if (!festival || festErr) return notFound();
