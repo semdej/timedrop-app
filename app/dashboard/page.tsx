@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { FestiCard } from "@/components/FestiCard";
 import { Container } from "@mantine/core";
+import { Navbar } from "@/components/Navbar";
 
 export default async function PrivatePage() {
   const supabase = await createClient();
@@ -23,26 +24,29 @@ export default async function PrivatePage() {
   }
 
   return (
-    <Container>
-      <p>Hello {authData.user.email}</p>
-      {festivals.map((festival) => {
-        const start = new Date(festival.start_date);
-        const daysLeft = Math.max(
-          0,
-          Math.ceil((start.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-        );
+    <>
+      <Container>
+        <Navbar />
+        <p>Hello {authData.user.email}</p>
+        {festivals.map((festival) => {
+          const start = new Date(festival.start_date);
+          const daysLeft = Math.max(
+            0,
+            Math.ceil((start.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+          );
 
-        return (
-          <FestiCard
-            key={festival.id}
-            title={festival.name}
-            slug={festival.slug}
-            description={`Location: ${festival.location}`}
-            daysLeft={daysLeft}
-            logourl={festival.logourl}
-          />
-        );
-      })}
-    </Container>
+          return (
+            <FestiCard
+              key={festival.id}
+              title={festival.name}
+              slug={festival.slug}
+              description={`Location: ${festival.location}`}
+              daysLeft={daysLeft}
+              logourl={festival.logourl}
+            />
+          );
+        })}
+      </Container>
+    </>
   );
 }
