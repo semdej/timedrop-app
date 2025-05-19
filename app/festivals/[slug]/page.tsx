@@ -1,8 +1,8 @@
 import { createClient } from "@/utils/supabase/server";
 import { notFound } from "next/navigation";
-import { Title, Text, Box, Stack, Divider, Container } from "@mantine/core";
-import dayjs from "dayjs";
+import { Title, Text, Box, Divider, Container } from "@mantine/core";
 import { Navbar } from "@/components/Navbar";
+import { ClientStageSchedule } from "@/components/ClientStageSchedule";
 
 type Props = {
   params: {
@@ -42,42 +42,14 @@ export default async function FestivalPage({ params }: Props) {
   return (
     <>
       <Navbar />
-
       <Container>
         <Box p="md">
           <Title order={2}>{festival.name}</Title>
           <Text size="sm" c="dimmed">
             {festival.location} • {festival.start_date} → {festival.end_date}
           </Text>
-
           <Divider my="md" />
-
-          {stages.map((stage) => (
-            <Box key={stage.id} mt="md">
-              <Title order={4}>{stage.name}</Title>
-              <Stack spacing="xs" mt="xs">
-                {stage.performances
-                  ?.sort(
-                    (a, b) =>
-                      new Date(a.start_time).getTime() -
-                      new Date(b.start_time).getTime()
-                  )
-                  .map((p) => (
-                    <Box key={p.id}>
-                      <Text fw={500}>
-                        {dayjs(p.start_time).format("HH:mm")} –{" "}
-                        {dayjs(p.end_time).format("HH:mm")} • {p.artist_name}
-                      </Text>
-                    </Box>
-                  ))}
-                {stage.performances?.length === 0 && (
-                  <Text size="sm" c="dimmed">
-                    No performances scheduled.
-                  </Text>
-                )}
-              </Stack>
-            </Box>
-          ))}
+          <ClientStageSchedule stages={stages} />
         </Box>
       </Container>
     </>
