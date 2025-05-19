@@ -13,7 +13,3 @@ export default withBundleAnalyzer({
     optimizePackageImports: ["@mantine/core", "@mantine/hooks"],
   },
 });
-
-module.exports = {
-  ignoreBuildErrors: true,
-};

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { createClient } from "@/utils/supabase/server";
 import { notFound } from "next/navigation";
 import { Title, Text, Box, Divider, Container } from "@mantine/core";
