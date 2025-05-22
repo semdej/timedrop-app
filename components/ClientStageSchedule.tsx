@@ -21,6 +21,7 @@ import timezone from "dayjs/plugin/timezone";
 import relativeTime from "dayjs/plugin/relativeTime";
 import updateLocale from "dayjs/plugin/updateLocale";
 import "dayjs/locale/nl";
+import Link from "next/link";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -64,9 +65,7 @@ type Props = {
 
 export function ClientStageSchedule({ stages }: Props) {
   const [now, setNow] = useState(dayjs().tz("Europe/Amsterdam"));
-  const [filter, setFilter] = useState<
-    "all" | "live" | "upcoming" | "favorites"
-  >("all");
+  const [filter, setFilter] = useState<"all" | "live" | "upcoming" | "favorites">("all");
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const supabase = createClient();
@@ -87,7 +86,7 @@ export function ClientStageSchedule({ stages }: Props) {
 
       setUserId(session.user.id);
 
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("favorite_performances")
         .select("performance_id")
         .eq("user_id", session.user.id);
@@ -118,20 +117,6 @@ export function ClientStageSchedule({ stages }: Props) {
       setFavoriteIds([...favoriteIds, performanceId]);
     }
   };
-
-  const allPerformances = stages.flatMap((stage) =>
-    stage.performances.map((p) => ({
-      ...p,
-      stageName: stage.name,
-      stageId: stage.id,
-    }))
-  );
-
-  const liveNow = allPerformances.find((p) => {
-    const start = dayjs(p.start_time).tz("Europe/Amsterdam");
-    const end = dayjs(p.end_time).tz("Europe/Amsterdam");
-    return now.isAfter(start) && now.isBefore(end);
-  });
 
   const groupedByDate: Record<string, Stage[]> = {};
 
@@ -177,21 +162,15 @@ export function ClientStageSchedule({ stages }: Props) {
           {stages.map((stage) => (
             <Box key={stage.id} mt="md">
               <Title order={4}>{stage.name}</Title>
-              <Stack spacing="xs" mt="xs">
+              <Stack mt="xs">
                 {stage.performances
-                  .sort(
-                    (a, b) =>
-                      new Date(a.start_time).getTime() -
-                      new Date(b.start_time).getTime()
-                  )
+                  .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
                   .filter((p) => {
                     const start = dayjs(p.start_time).tz("Europe/Amsterdam");
                     const end = dayjs(p.end_time).tz("Europe/Amsterdam");
-                    if (filter === "live")
-                      return now.isAfter(start) && now.isBefore(end);
+                    if (filter === "live") return now.isAfter(start) && now.isBefore(end);
                     if (filter === "upcoming") return now.isBefore(start);
-                    if (filter === "favorites")
-                      return favoriteIds.includes(p.id);
+                    if (filter === "favorites") return favoriteIds.includes(p.id);
                     return true;
                   })
                   .map((p) => {
@@ -202,61 +181,50 @@ export function ClientStageSchedule({ stages }: Props) {
                     const isFavorite = favoriteIds.includes(p.id);
 
                     let timeLabel = "";
-                    if (isLive) timeLabel = "LIVE NU";
-                    else if (isUpcoming)
-                      timeLabel = `Straks (${now.to(start, true)})`;
+                    if (isLive) timeLabel = "NU LIVE";
+                    else if (isUpcoming) timeLabel = `Straks (${now.to(start, true)})`;
 
                     return (
-                      <Paper
-                        key={p.id}
-                        p="sm"
-                        radius="md"
-                        withBorder
-                        bg={
-                          isLive
-                            ? "blue.1"
-                            : isUpcoming
-                              ? "gray.0"
-                              : "transparent"
-                        }
-                        shadow={isLive ? "sm" : "none"}
-                      >
-                        <Group justify="space-between">
-                          <Text fw={500} c={isLive ? "blue.9" : undefined}>
-                            {start.format("HH:mm")} – {end.format("HH:mm")} •{" "}
-                            {p.artist_name}
-                            {timeLabel && (
-                              <Text
-                                span
-                                fw={700}
-                                ml="sm"
-                                c={isLive ? "red" : "gray"}
-                              >
-                                {timeLabel}
-                              </Text>
-                            )}
-                          </Text>
-
-                          <Tooltip
-                            label={
-                              isFavorite
-                                ? "Verwijder uit schema"
-                                : "Voeg toe aan schema"
-                            }
-                          >
-                            <ActionIcon
-                              variant="subtle"
-                              onClick={() => toggleFavorite(p.id)}
-                            >
-                              {isFavorite ? (
-                                <IconStarFilled size={20} color="gold" />
-                              ) : (
-                                <IconStar size={20} />
+                      <Link key={p.id} href={`/performance/${p.id}`} style={{ textDecoration: "none", color: "black" }}>
+                        <Paper
+                          p="sm"
+                          radius="md"
+                          withBorder
+                          bg={isLive ? "blue.1" : isUpcoming ? "gray.0" : "transparent"}
+                          shadow={isLive ? "sm" : "none"}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <Group justify="space-between">
+                            <Text fw={500} c={isLive ? "blue.9" : undefined}>
+                              {start.format("HH:mm")} – {end.format("HH:mm")} • {p.artist_name}
+                              {timeLabel && (
+                                <Text span fw={700} ml="sm" c={isLive ? "red" : "gray"}>
+                                  {timeLabel}
+                                </Text>
                               )}
-                            </ActionIcon>
-                          </Tooltip>
-                        </Group>
-                      </Paper>
+                            </Text>
+
+                            <Tooltip
+                              label={isFavorite ? "Verwijder uit schema" : "Voeg toe aan schema"}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <ActionIcon
+                                variant="subtle"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  toggleFavorite(p.id);
+                                }}
+                              >
+                                {isFavorite ? (
+                                  <IconStarFilled size={20} color="gold" />
+                                ) : (
+                                  <IconStar size={20} />
+                                )}
+                              </ActionIcon>
+                            </Tooltip>
+                          </Group>
+                        </Paper>
+                      </Link>
                     );
                   })}
               </Stack>

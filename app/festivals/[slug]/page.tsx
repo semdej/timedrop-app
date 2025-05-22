@@ -2,9 +2,10 @@ export const dynamic = "force-dynamic";
 
 import { createClient } from "@/utils/supabase/server";
 import { notFound } from "next/navigation";
-import { Title, Text, Box, Divider, Container } from "@mantine/core";
+import { Title, Text, Box, Divider, Container, Stack } from "@mantine/core";
 import { Navbar } from "@/components/Navbar";
 import { ClientStageSchedule } from "@/components/ClientStageSchedule";
+import { BackButton } from "@/components/BackButton";
 
 type Props = {
   params: {
@@ -46,12 +47,17 @@ export default async function FestivalPage({ params }: Props) {
       <Navbar />
       <Container>
         <Box p="md">
-          <Title order={2}>{festival.name}</Title>
-          <Text size="sm" c="dimmed">
-            {festival.location} • {festival.start_date} → {festival.end_date}
-          </Text>
-          <Divider my="md" />
-          <ClientStageSchedule stages={stages} />
+          <Stack gap="md">
+            <BackButton />
+
+            <Title order={2}>{festival.name}</Title>
+            <Text size="sm" c="dimmed">
+              {festival.location} • {festival.start_date} → {festival.end_date}
+            </Text>
+
+            <Divider my="md" />
+            <ClientStageSchedule stages={stages} />
+          </Stack>
         </Box>
       </Container>
     </>
