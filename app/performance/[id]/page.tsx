@@ -40,10 +40,9 @@ export default async function PerformancePage({
     <>
       <Navbar />
       <Container>
-        <Paper p="lg" radius="md" withBorder shadow="md">
+      <Box p="md">
           <Stack gap="md">
             <BackButton />
-
             <Title order={2}>{performance.artist_name}</Title>
             <Text c="dimmed">
               {start.format("dddd D MMMM YYYY")} — {start.format("HH:mm")} tot{" "}
@@ -93,7 +92,7 @@ export default async function PerformancePage({
               <Text c="dimmed">Geen nummers geregistreerd.</Text>
             )}
           </Stack>
-        </Paper>
+        </Box>
       </Container>
     </>
   );
