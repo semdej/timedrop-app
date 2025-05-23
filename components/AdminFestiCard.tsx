@@ -1,19 +1,19 @@
 "use client";
 
-import { Stack, Text, Group, Button, Image } from "@mantine/core";
+import { Stack, Text, Group, Button, Image, Box } from "@mantine/core";
 import Link from "next/link";
 
 type AdminFestiCardProps = {
-  title: string;
-  description: string;
+  name: string;
+  location: string;
   daysLeft: number;
   logourl: string;
   slug: string;
 };
 
 export function AdminFestiCard({
-  title,
-  description,
+  name,
+  location,
   daysLeft,
   logourl,
   slug,
@@ -29,23 +29,26 @@ export function AdminFestiCard({
     >
       <Group justify="space-between" align="center">
         <Stack style={{ flex: 1 }}>
-          <Text fw={500}>{title}</Text>
+          <Text fw={500}>{name}</Text>
           <Text size="sm" c="dimmed">
-            {description}
+            {location}
           </Text>
           <Text size="xs" c="gray">
             {daysLeft} days left
           </Text>
         </Stack>
 
-        <Image
-          src={logourl}
-          alt="Festival Logo"
-          width={60}
-          height={60}
-          fit="contain"
-          radius="md"
-        />
+        <Box style={{ alignSelf: "flex-start" }}>
+          <Image
+            src={logourl}
+            alt="Festival Logo"
+            width={60}
+            height={60}
+            fit="contain"
+            radius="md"
+            style={{ minWidth: 60 }}
+          />
+        </Box>
       </Group>
 
       <Button

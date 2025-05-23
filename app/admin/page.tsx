@@ -48,10 +48,10 @@ export default async function AdminPage() {
           {festivals.map((festival: any) => (
             <AdminFestiCard
               key={festival.id}
-              title={festival.title}
-              description={festival.description}
+              name={festival.name}
+              location={festival.location}
               daysLeft={calculateDaysLeft(festival.start_date)}
-              logourl={festival.logo_url}
+              logourl={festival.logourl}
               slug={festival.slug}
             />
           ))}
