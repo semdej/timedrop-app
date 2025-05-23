@@ -8,19 +8,26 @@ import { ClientStageSchedule } from "@/components/ClientStageSchedule";
 import { BackButton } from "@/components/BackButton";
 
 type Props = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
 export default async function FestivalPage(props: Props) {
+  // Await params as required by latest Next.js
   const params = await props.params;
+  const slug = params.slug;
+
+  // Basic slug validation (alphanumeric and dashes only)
+  if (!/^[a-zA-Z0-9-]+$/.test(slug)) return notFound();
+
+  // Use only public Supabase anon key here (never service role key)
   const supabase = await createClient();
 
   const { data: festival, error: festErr } = await supabase
     .from("festivals")
     .select("*")
-    .eq("slug", params.slug)
+    .eq("slug", slug)
     .single();
 
   if (!festival || festErr) return notFound();

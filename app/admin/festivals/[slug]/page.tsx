@@ -7,10 +7,11 @@ import { AdminFestivalManager } from "@/components/AdminFestivalManager";
 import { Navbar } from "@/components/Navbar";
 import { BackButton } from "@/components/BackButton";
 
+// In latest Next.js, params is a Promise in dynamic routes
 type PageProps = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
 export default async function AdminFestivalPage(props: PageProps) {
