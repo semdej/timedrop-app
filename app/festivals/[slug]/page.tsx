@@ -13,7 +13,8 @@ type Props = {
   };
 };
 
-export default async function FestivalPage({ params }: Props) {
+export default async function FestivalPage(props: Props) {
+  const params = await props.params;
   const supabase = await createClient();
 
   const { data: festival, error: festErr } = await supabase

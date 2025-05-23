@@ -7,13 +7,16 @@ import { AdminFestivalManager } from "@/components/AdminFestivalManager";
 import { Navbar } from "@/components/Navbar";
 import { BackButton } from "@/components/BackButton";
 
-type Props = {
+type PageProps = {
   params: {
     slug: string;
   };
 };
 
-export default async function AdminFestivalPage({ params }: Props) {
+export default async function AdminFestivalPage(props: PageProps) {
+  const params = await props.params;
+  const slug = params.slug;
+
   const supabase = await createClient();
 
   // Get user
@@ -36,7 +39,7 @@ export default async function AdminFestivalPage({ params }: Props) {
   const { data: festival, error: festErr } = await supabase
     .from("festivals")
     .select("*")
-    .eq("slug", params.slug)
+    .eq("slug", slug)
     .single();
 
   if (!festival || festErr) return notFound();
