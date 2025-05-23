@@ -10,9 +10,8 @@ import {
   Stack,
   Card,
   Divider,
-  Text,
   ActionIcon,
-  rem,
+  ScrollArea,
 } from "@mantine/core";
 import { IconTrash, IconPlus, IconDeviceFloppy } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
@@ -69,17 +68,22 @@ export function AdminFestivalManager({
     <Stack gap="xl">
       <Card withBorder shadow="sm" radius="md">
         <Stack gap="sm">
-          <Title order={4}>Add New Stage</Title>
-          <Group>
+          <Title order={4} size="h5">
+            Add New Stage
+          </Title>
+          <Group wrap="wrap" align="flex-end">
             <TextInput
               value={newStageName}
               onChange={(e) => setNewStageName(e.currentTarget.value)}
               placeholder="Stage name"
-              w="100%"
+              w={{ base: "100%", sm: "auto" }}
+              flex={1}
             />
             <Button
               leftSection={<IconPlus size={16} />}
               onClick={handleAddStage}
+              fullWidth
+              mt={{ base: "sm", sm: 0 }}
             >
               Add
             </Button>
@@ -150,12 +154,15 @@ function StageTable({
   return (
     <Card withBorder shadow="sm" radius="md">
       <Stack>
-        <Group justify="space-between">
-          <Title order={4}>{stage.name}</Title>
+        <Group justify="space-between" wrap="wrap">
+          <Title order={4} size="h5">
+            {stage.name}
+          </Title>
           <ActionIcon
             color="red"
             variant="light"
             onClick={() => onDeleteStage(stage.id)}
+            mt={{ base: "sm", sm: 0 }}
           >
             <IconTrash size={18} />
           </ActionIcon>
@@ -163,84 +170,100 @@ function StageTable({
 
         <Divider />
 
-        <Table striped highlightOnHover withColumnBorders verticalSpacing="sm">
-          <thead>
-            <tr>
-              <th>Artist</th>
-              <th>Start</th>
-              <th>End</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {stage.performances.map((performance) => (
-              <tr key={performance.id}>
-                <td>
-                  <TextInput
-                    defaultValue={performance.artist_name}
-                    onChange={(e) =>
-                      (performance.artist_name = e.currentTarget.value)
-                    }
-                  />
-                </td>
-                <td>
-                  <TextInput
-                    type="datetime-local"
-                    defaultValue={performance.start_time?.slice(0, 16)}
-                    onChange={(e) =>
-                      (performance.start_time = e.currentTarget.value)
-                    }
-                  />
-                </td>
-                <td>
-                  <TextInput
-                    type="datetime-local"
-                    defaultValue={performance.end_time?.slice(0, 16)}
-                    onChange={(e) =>
-                      (performance.end_time = e.currentTarget.value)
-                    }
-                  />
-                </td>
-                <td>
-                  <Group gap="xs">
-                    <ActionIcon
-                      color="blue"
-                      variant="light"
-                      onClick={() => handleUpdatePerformance(performance)}
+        <ScrollArea>
+          <Table
+            striped
+            highlightOnHover
+            withColumnBorders
+            verticalSpacing="sm"
+            miw={600}
+          >
+            <thead>
+              <tr>
+                <th>Artist</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stage.performances.map((performance) => (
+                <tr key={performance.id}>
+                  <td>
+                    <TextInput
+                      defaultValue={performance.artist_name}
+                      onChange={(e) =>
+                        (performance.artist_name = e.currentTarget.value)
+                      }
+                      w="100%"
+                      size="sm"
+                    />
+                  </td>
+                  <td>
+                    <TextInput
+                      type="datetime-local"
+                      defaultValue={performance.start_time?.slice(0, 16)}
+                      onChange={(e) =>
+                        (performance.start_time = e.currentTarget.value)
+                      }
+                      w="100%"
+                      size="sm"
+                    />
+                  </td>
+                  <td>
+                    <TextInput
+                      type="datetime-local"
+                      defaultValue={performance.end_time?.slice(0, 16)}
+                      onChange={(e) =>
+                        (performance.end_time = e.currentTarget.value)
+                      }
+                      w="100%"
+                      size="sm"
+                    />
+                  </td>
+                  <td>
+                    <Group gap="xs">
+                      <ActionIcon
+                        color="blue"
+                        variant="light"
+                        onClick={() => handleUpdatePerformance(performance)}
+                      >
+                        <IconDeviceFloppy size={18} />
+                      </ActionIcon>
+                      <ActionIcon
+                        color="red"
+                        variant="light"
+                        onClick={() => handleDeletePerformance(performance.id)}
+                      >
+                        <IconTrash size={18} />
+                      </ActionIcon>
+                    </Group>
+                  </td>
+                </tr>
+              ))}
+              <tr>
+                <td colSpan={4}>
+                  <Group wrap="wrap">
+                    <TextInput
+                      value={newPerformance}
+                      onChange={(e) => setNewPerformance(e.currentTarget.value)}
+                      placeholder="New performance"
+                      w={{ base: "100%", sm: "auto" }}
+                      flex={1}
+                    />
+                    <Button
+                      leftSection={<IconPlus size={16} />}
+                      onClick={handleAddPerformance}
+                      fullWidth
                     >
-                      <IconDeviceFloppy size={18} />
-                    </ActionIcon>
-                    <ActionIcon
-                      color="red"
-                      variant="light"
-                      onClick={() => handleDeletePerformance(performance.id)}
-                    >
-                      <IconTrash size={18} />
-                    </ActionIcon>
+                      Add
+                    </Button>
                   </Group>
                 </td>
               </tr>
-            ))}
-            <tr>
-              <td colSpan={4}>
-                <Group>
-                  <TextInput
-                    value={newPerformance}
-                    onChange={(e) => setNewPerformance(e.currentTarget.value)}
-                    placeholder="New performance"
-                    w="100%"
-                  />
-                  <Button
-                    leftSection={<IconPlus size={16} />}
-                    onClick={handleAddPerformance}
-                  >
-                    Add
-                  </Button>
-                </Group>
-              </td>
-            </tr>
-          </tbody>
-        </Table>
+            </tbody>
+          </Table>
+        </ScrollArea>
       </Stack>
     </Card>
   );

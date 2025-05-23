@@ -7,27 +7,19 @@ import { AdminFestivalManager } from "@/components/AdminFestivalManager";
 import { Navbar } from "@/components/Navbar";
 import { BackButton } from "@/components/BackButton";
 
-// In latest Next.js, params is a Promise in dynamic routes
 type PageProps = {
-  params: Promise<{
-    slug: string;
-  }>;
+  params: Promise<{ slug: string }>;
 };
 
 export default async function AdminFestivalPage(props: PageProps) {
-  const params = await props.params;
-  const slug = params.slug;
-
+  const { slug } = await props.params;
   const supabase = await createClient();
 
-  // Get user
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
   if (!user) redirect("/login");
 
-  // Check if user is admin
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("role")
@@ -36,7 +28,6 @@ export default async function AdminFestivalPage(props: PageProps) {
 
   if (profileError || profile?.role !== "admin") redirect("/login");
 
-  // Fetch festival
   const { data: festival, error: festErr } = await supabase
     .from("festivals")
     .select("*")
@@ -45,7 +36,6 @@ export default async function AdminFestivalPage(props: PageProps) {
 
   if (!festival || festErr) return notFound();
 
-  // Fetch stages and performances
   const { data: stages, error: stageErr } = await supabase
     .from("stages")
     .select("*, performances(*)")
@@ -57,8 +47,8 @@ export default async function AdminFestivalPage(props: PageProps) {
   return (
     <>
       <Navbar />
-      <Container size="lg" py="xl">
-        <Box p="md">
+      <Container size="lg" py="xl" px={{ base: "sm", sm: "xl" }}>
+        <Box p={{ base: "sm", sm: "md" }}>
           <Stack gap="md">
             <BackButton />
             <Title order={2}>Edit: {festival.name}</Title>
