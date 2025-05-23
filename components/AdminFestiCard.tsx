@@ -51,16 +51,14 @@ export function AdminFestiCard({
         </Box>
       </Group>
 
-      <Button
-        component={Link}
+      <Link
         href={`/admin/festivals/${slug}`}
-        variant="light"
-        color="blue"
-        fullWidth
-        mt="sm"
+        style={{ textDecoration: "none" }}
       >
-        Edit Timetable
-      </Button>
+        <Button variant="light" color="blue" fullWidth mt="sm">
+          Edit Timetable
+        </Button>
+      </Link>
     </Stack>
   );
 }
