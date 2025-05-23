@@ -64,7 +64,7 @@ export function AuthModule() {
           <TextInput
             label="Email"
             name="email"
-            placeholder="you@mantine.dev"
+            placeholder="you@timedrop.nl"
             required
             radius="md"
             type="email"
