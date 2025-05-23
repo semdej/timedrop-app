@@ -1,106 +1,125 @@
 "use client";
+
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { type User } from "@supabase/supabase-js";
-import { Button } from "@mantine/core";
+import {
+  Button,
+  Container,
+  Group,
+  TextInput,
+  Title,
+  Paper,
+  Loader,
+  Stack,
+  Divider,
+} from "@mantine/core";
 
 export default function AccountForm({ user }: { user: User | null }) {
   const supabase = createClient();
+
   const [loading, setLoading] = useState(true);
-  const [username, setUsername] = useState<string | null>(null);
+  const [username, setUsername] = useState<string>("");
   const [avatar_url, setAvatarUrl] = useState<string | null>(null);
 
   const getProfile = useCallback(async () => {
+    if (!user?.id) return;
+
     try {
       setLoading(true);
-
       const { data, error, status } = await supabase
         .from("profiles")
-        .select(`username, avatar_url`)
-        .eq("id", user?.id)
+        .select("username, avatar_url")
+        .eq("id", user.id)
         .single();
 
-      if (error && status !== 406) {
-        console.log(error);
-        throw error;
-      }
+      if (error && status !== 406) throw error;
 
       if (data) {
-        setUsername(data.username);
-        setAvatarUrl(data.avatar_url);
+        setUsername(data.username || "");
+        setAvatarUrl(data.avatar_url || null);
       }
     } catch (error) {
+      console.error("Error loading user data:", error);
       alert("Error loading user data!");
     } finally {
       setLoading(false);
     }
-  }, [user, supabase]);
+  }, [supabase, user]);
 
   useEffect(() => {
     getProfile();
-  }, [user, getProfile]);
+  }, [getProfile]);
 
-  async function updateProfile({
-    username,
-    avatar_url,
-  }: {
-    username: string | null;
-    avatar_url: string | null;
-  }) {
+  const updateProfile = async () => {
+    if (!user?.id) {
+      alert("User not found.");
+      return;
+    }
+
     try {
       setLoading(true);
-
-      const { error } = await supabase.from("profiles").upsert({
-        id: user?.id as string,
+      const updates = {
+        id: user.id,
         username,
         avatar_url,
         updated_at: new Date().toISOString(),
-      });
-      if (error) throw error;
+      };
+
+      const { error, status } = await supabase.from("profiles").upsert(updates);
+
+      if (error) {
+        console.error("Supabase error:", error.message, error.details);
+        alert(`Update failed: ${error.message}`);
+        return;
+      }
+
+      if (status !== 200 && status !== 201) {
+        console.warn("Unexpected status code from upsert:", status);
+      }
+
       alert("Profile updated!");
-    } catch (error) {
-      alert("Error updating the data!");
+    } catch (err) {
+      console.error("Unexpected error during update:", err);
+      alert("An unexpected error occurred!");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="form-widget">
-      {/* ... */}
+    <Container size="sm" mt="lg">
+      <Paper shadow="md" radius="md" p="xl" withBorder>
+        <Title order={3} mb="md">
+          Your Account
+        </Title>
+        {loading ? (
+          <Loader />
+        ) : (
+          <Stack>
+            <TextInput label="Email" value={user?.email ?? ""} disabled />
 
-      <div>
-        <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={user?.email} disabled />
-      </div>
+            <TextInput
+              label="Username"
+              value={username}
+              onChange={(e) => setUsername(e.currentTarget.value)}
+              placeholder="Enter your username"
+            />
 
-      <div>
-        <label htmlFor="username">Username</label>
-        <input
-          id="username"
-          type="text"
-          value={username || ""}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-      </div>
+            <Group justify="space-between" mt="md">
+              <Button onClick={updateProfile} disabled={loading}>
+                {loading ? "Updating..." : "Update"}
+              </Button>
 
-      <div>
-        <Button
-          className="button primary block"
-          onClick={() => updateProfile({ username, avatar_url })}
-          disabled={loading}
-        >
-          {loading ? "Loading ..." : "Update"}
-        </Button>
-      </div>
-
-      <div>
-        <form action="/auth/signout" method="post">
-          <button className="button block" type="submit">
-            Sign out
-          </button>
-        </form>
-      </div>
-    </div>
+              <form action="/auth/signout" method="post">
+                <Button variant="light" color="red" type="submit">
+                  Sign out
+                </Button>
+              </form>
+            </Group>
+          </Stack>
+        )}
+      </Paper>
+    </Container>
   );
 }
