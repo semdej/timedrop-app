@@ -45,60 +45,86 @@ export function Navbar() {
   return (
     <Box pb={30}>
       <header className={classes.header}>
-        <Group justify="space-between" h="100%">
-          <Image src="/logo.png" alt="Logo" w={130} />
+        <Box pos="relative" w="100%" h="100%">
+          <Group justify="space-between" h="100%">
+            <Image src="/logo.png" alt="Logo" w={130} />
 
-          <Group h="100%" gap={0} visibleFrom="sm">
-            <Link href="/dashboard" className={classes.link}>
-              Dashboard
-            </Link>
+            {!loading && (
+              <Group visibleFrom="sm">
+                {user ? (
+                  <Menu shadow="md" width={200}>
+                    <Menu.Target>
+                      <UnstyledButton aria-label="User menu">
+                        <FiUser size={20} />
+                      </UnstyledButton>
+                    </Menu.Target>
+                    <Menu.Dropdown>
+                      <Menu.Item
+                        component={Link}
+                        href="/account"
+                        leftSection={<FiSettings size={16} />}
+                      >
+                        Account
+                      </Menu.Item>
+                      <Menu.Item
+                        color="red"
+                        onClick={handleLogout}
+                        leftSection={<FiLogOut size={16} />}
+                      >
+                        Logout
+                      </Menu.Item>
+                    </Menu.Dropdown>
+                  </Menu>
+                ) : (
+                  <Button
+                    component={Link}
+                    href="/login"
+                    variant="filled"
+                    aria-label="Login or Sign up"
+                  >
+                    <FiLogIn size={20} />
+                  </Button>
+                )}
+              </Group>
+            )}
+
+            <Burger
+              opened={drawerOpened}
+              onClick={toggleDrawer}
+              hiddenFrom="sm"
+            />
           </Group>
 
-          {!loading && (
-            <Group visibleFrom="sm">
-              {user ? (
-                <Menu shadow="md" width={200}>
-                  <Menu.Target>
-                    <UnstyledButton aria-label="User menu">
-                      <FiUser size={20} />
-                    </UnstyledButton>
-                  </Menu.Target>
-                  <Menu.Dropdown>
-                    <Menu.Item
-                      component={Link}
-                      href="/account"
-                      leftSection={<FiSettings size={16} />}
-                    >
-                      Account
-                    </Menu.Item>
-                    <Menu.Item
-                      color="red"
-                      onClick={handleLogout}
-                      leftSection={<FiLogOut size={16} />}
-                    >
-                      Logout
-                    </Menu.Item>
-                  </Menu.Dropdown>
-                </Menu>
-              ) : (
-                <Button
-                  component={Link}
-                  href="/login"
-                  variant="filled"
-                  aria-label="Login or Sign up"
-                >
-                  <FiLogIn size={20} />
-                </Button>
-              )}
-            </Group>
-          )}
-
-          <Burger
-            opened={drawerOpened}
-            onClick={toggleDrawer}
-            hiddenFrom="sm"
-          />
-        </Group>
+          <Group
+            visibleFrom="sm"
+            gap="sm"
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+          >
+            <Button
+              component={Link}
+              href="/"
+              variant="subtle"
+              size="md"
+              radius="md"
+            >
+              Home
+            </Button>
+            <Button
+              component={Link}
+              href="/dashboard"
+              variant="subtle"
+              size="md"
+              radius="md"
+            >
+              Dashboard
+            </Button>
+          </Group>
+        </Box>
       </header>
 
       <Drawer
