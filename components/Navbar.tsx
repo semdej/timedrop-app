@@ -10,7 +10,6 @@ import {
   Image,
   Menu,
   ScrollArea,
-  Text,
   UnstyledButton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -19,27 +18,28 @@ import { createClient } from "@/utils/supabase/client";
 import classes from "./Navbar.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { FiUser, FiLogIn, FiLogOut, FiSettings } from "react-icons/fi";
 
 export function Navbar() {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
     useDisclosure(false);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const supabase = createClient();
   const router = useRouter();
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (data?.user) {
-        setUser(data.user);
-      }
+    const getSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      setUser(data?.session?.user ?? null);
+      setLoading(false);
     };
-    getUser();
+    getSession();
   }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.refresh(); // or router.push('/login') if you want a redirect
+    router.push("/login");
   };
 
   return (
@@ -54,29 +54,44 @@ export function Navbar() {
             </Link>
           </Group>
 
-          <Group visibleFrom="sm">
-            {user ? (
-              <Menu shadow="md" width={200}>
-                <Menu.Target>
-                  <UnstyledButton>
-                    <Text fw={500}>{user.email}</Text>
-                  </UnstyledButton>
-                </Menu.Target>
-                <Menu.Dropdown>
-                  <Menu.Item component={Link} href="/account">
-                    Account
-                  </Menu.Item>
-                  <Menu.Item color="red" onClick={handleLogout}>
-                    Logout
-                  </Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
-            ) : (
-              <Link href="/login">
-                <Button variant="filled">Log in / Sign up</Button>
-              </Link>
-            )}
-          </Group>
+          {!loading && (
+            <Group visibleFrom="sm">
+              {user ? (
+                <Menu shadow="md" width={200}>
+                  <Menu.Target>
+                    <UnstyledButton aria-label="User menu">
+                      <FiUser size={20} />
+                    </UnstyledButton>
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    <Menu.Item
+                      component={Link}
+                      href="/account"
+                      leftSection={<FiSettings size={16} />}
+                    >
+                      Account
+                    </Menu.Item>
+                    <Menu.Item
+                      color="red"
+                      onClick={handleLogout}
+                      leftSection={<FiLogOut size={16} />}
+                    >
+                      Logout
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+              ) : (
+                <Button
+                  component={Link}
+                  href="/login"
+                  variant="filled"
+                  aria-label="Login or Sign up"
+                >
+                  <FiLogIn size={20} />
+                </Button>
+              )}
+            </Group>
+          )}
 
           <Burger
             opened={drawerOpened}
@@ -104,27 +119,47 @@ export function Navbar() {
 
           <Divider my="sm" />
 
-          <Group justify="center" grow pb="xl" px="md">
-            {user ? (
-              <>
-                <Button component={Link} href="/account" variant="default">
-                  Account
-                </Button>
-                <Button color="red" onClick={handleLogout}>
-                  Logout
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button component={Link} href="/login" variant="default">
-                  Log in
-                </Button>
-                <Button component={Link} href="/login">
-                  Sign up
-                </Button>
-              </>
-            )}
-          </Group>
+          {!loading && (
+            <Group justify="center" grow pb="xl" px="md">
+              {user ? (
+                <>
+                  <Button
+                    component={Link}
+                    href="/account"
+                    variant="default"
+                    leftSection={<FiSettings size={16} />}
+                  >
+                    Account
+                  </Button>
+                  <Button
+                    color="red"
+                    onClick={handleLogout}
+                    leftSection={<FiLogOut size={16} />}
+                  >
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    component={Link}
+                    href="/login"
+                    variant="default"
+                    leftSection={<FiLogIn size={16} />}
+                  >
+                    Log in
+                  </Button>
+                  <Button
+                    component={Link}
+                    href="/login"
+                    leftSection={<FiLogIn size={16} />}
+                  >
+                    Sign up
+                  </Button>
+                </>
+              )}
+            </Group>
+          )}
         </ScrollArea>
       </Drawer>
     </Box>
