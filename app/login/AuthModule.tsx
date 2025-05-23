@@ -13,11 +13,27 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
-import { login, signup } from "./actions"; // Your server actions
+import { login, signup } from "./actions";
 import classes from "./Auth.module.css";
 
 export function AuthModule() {
-  const [isLogin, setIsLogin] = useState(true); // State to toggle between login/signup forms
+  const [isLogin, setIsLogin] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+
+    const action = isLogin ? login : signup;
+    const result = await action(formData);
+
+    if (result?.error) {
+      setError(result.error);
+    } else {
+      // Only redirect on success (or use router.push if needed)
+      window.location.href = isLogin ? "/dashboard" : "/";
+    }
+  };
 
   return (
     <Container size={420} my={40}>
@@ -44,7 +60,7 @@ export function AuthModule() {
       </Text>
 
       <Paper withBorder shadow="sm" p={22} mt={30} radius="md">
-        <form action={isLogin ? login : signup}>
+        <form onSubmit={handleSubmit}>
           <TextInput
             label="Email"
             name="email"
@@ -64,6 +80,11 @@ export function AuthModule() {
           <Group justify="space-between" mt="lg">
             <Checkbox label="Remember me" />
           </Group>
+          {error && (
+            <Text color="red" mt="sm" size="sm">
+              {error}
+            </Text>
+          )}
           <Button type="submit" fullWidth mt="xl" radius="md">
             {isLogin ? "Sign in" : "Sign up"}
           </Button>
