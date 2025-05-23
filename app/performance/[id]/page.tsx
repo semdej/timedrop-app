@@ -1,15 +1,7 @@
 import { Navbar } from "@/components/Navbar";
 import { BackButton } from "@/components/BackButton";
 import { createClient } from "@/utils/supabase/server";
-import {
-  Box,
-  Container,
-  Divider,
-  Paper,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
+import { Box, Container, Divider, Stack, Text, Title } from "@mantine/core";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
@@ -18,11 +10,19 @@ import { notFound } from "next/navigation";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-export default async function PerformancePage({
-  params,
-}: {
-  params: { id: string };
-}) {
+type PageProps = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export default async function PerformancePage(props: PageProps) {
+  const params = await props.params;
+  const id = params.id;
+
+  // Basic id validation (alphanumeric and dashes only)
+  if (!/^[a-zA-Z0-9-]+$/.test(id)) return notFound();
+
   const supabase = await createClient();
 
   const { data: performance } = await supabase
@@ -30,7 +30,7 @@ export default async function PerformancePage({
     .select(
       "id, artist_name, start_time, end_time, songs(title, start_time, end_time)"
     )
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (!performance) return notFound();
@@ -55,7 +55,7 @@ export default async function PerformancePage({
 
             <Title order={4}>Gespeelde nummers</Title>
 
-            {performance.songs.length > 0 ? (
+            {performance.songs && performance.songs.length > 0 ? (
               <Stack>
                 {performance.songs
                   .sort((a: any, b: any) =>
