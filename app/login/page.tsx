@@ -9,7 +9,7 @@ export default function LoginPage() {
     <>
       <Navbar />
 
-      <Container>
+      <Container size="lg" py="xl">
         <AuthModule />
       </Container>
     </>

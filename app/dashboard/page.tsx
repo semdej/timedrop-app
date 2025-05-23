@@ -1,19 +1,17 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
-import { FestiCard } from "@/components/FestiCard";
-import { Container } from "@mantine/core";
+import { Container, Title, Text, Space } from "@mantine/core";
 import { Navbar } from "@/components/Navbar";
+import SearchableFestivals from "@/components/SearchableFestivals";
 
 export default async function PrivatePage() {
   const supabase = await createClient();
 
-  // Auth check
   const { data: authData, error: authError } = await supabase.auth.getUser();
   if (authError || !authData?.user) {
     redirect("/login");
   }
 
-  // Fetch festivals (you can expand this with joins later)
   const { data: festivals, error: fetchError } = await supabase
     .from("festivals")
     .select("*")
@@ -26,27 +24,16 @@ export default async function PrivatePage() {
   return (
     <>
       <Navbar />
-
-      <Container>
-        <p>Hello {authData.user.email}</p>
-        {festivals.map((festival) => {
-          const start = new Date(festival.start_date);
-          const daysLeft = Math.max(
-            0,
-            Math.ceil((start.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-          );
-
-          return (
-            <FestiCard
-              key={festival.id}
-              title={festival.name}
-              slug={festival.slug}
-              description={`Location: ${festival.location}`}
-              daysLeft={daysLeft}
-              logourl={festival.logourl}
-            />
-          );
-        })}
+      <Container size="lg" py="xl">
+        <Title order={2} mb="sm">
+          Welcome back!
+        </Title>
+        <Text size="md" color="dimmed">
+          Hello <strong>{authData.user.email}</strong>, here are the upcoming
+          festivals:
+        </Text>
+        <Space h="xl" />
+        <SearchableFestivals festivals={festivals} />
       </Container>
     </>
   );

@@ -65,7 +65,9 @@ type Props = {
 
 export function ClientStageSchedule({ stages }: Props) {
   const [now, setNow] = useState(dayjs().tz("Europe/Amsterdam"));
-  const [filter, setFilter] = useState<"all" | "live" | "upcoming" | "favorites">("all");
+  const [filter, setFilter] = useState<
+    "all" | "live" | "upcoming" | "favorites"
+  >("all");
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const supabase = createClient();
@@ -139,7 +141,7 @@ export function ClientStageSchedule({ stages }: Props) {
 
   return (
     <Box>
-      <Container my="md">
+      <Container size="lg" py="xl">
         <SegmentedControl
           fullWidth
           value={filter}
@@ -164,13 +166,19 @@ export function ClientStageSchedule({ stages }: Props) {
               <Title order={4}>{stage.name}</Title>
               <Stack mt="xs">
                 {stage.performances
-                  .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
+                  .sort(
+                    (a, b) =>
+                      new Date(a.start_time).getTime() -
+                      new Date(b.start_time).getTime()
+                  )
                   .filter((p) => {
                     const start = dayjs(p.start_time).tz("Europe/Amsterdam");
                     const end = dayjs(p.end_time).tz("Europe/Amsterdam");
-                    if (filter === "live") return now.isAfter(start) && now.isBefore(end);
+                    if (filter === "live")
+                      return now.isAfter(start) && now.isBefore(end);
                     if (filter === "upcoming") return now.isBefore(start);
-                    if (filter === "favorites") return favoriteIds.includes(p.id);
+                    if (filter === "favorites")
+                      return favoriteIds.includes(p.id);
                     return true;
                   })
                   .map((p) => {
@@ -182,30 +190,51 @@ export function ClientStageSchedule({ stages }: Props) {
 
                     let timeLabel = "";
                     if (isLive) timeLabel = "NU LIVE";
-                    else if (isUpcoming) timeLabel = `Straks (${now.to(start, true)})`;
+                    else if (isUpcoming)
+                      timeLabel = `Straks (${now.to(start, true)})`;
 
                     return (
-                      <Link key={p.id} href={`/performance/${p.id}`} style={{ textDecoration: "none", color: "black" }}>
+                      <Link
+                        key={p.id}
+                        href={`/performance/${p.id}`}
+                        style={{ textDecoration: "none", color: "black" }}
+                      >
                         <Paper
                           p="sm"
                           radius="md"
                           withBorder
-                          bg={isLive ? "blue.1" : isUpcoming ? "gray.0" : "transparent"}
+                          bg={
+                            isLive
+                              ? "blue.1"
+                              : isUpcoming
+                                ? "gray.0"
+                                : "transparent"
+                          }
                           shadow={isLive ? "sm" : "none"}
                           style={{ cursor: "pointer" }}
                         >
                           <Group justify="space-between">
                             <Text fw={500} c={isLive ? "blue.9" : undefined}>
-                              {start.format("HH:mm")} – {end.format("HH:mm")} • {p.artist_name}
+                              {start.format("HH:mm")} – {end.format("HH:mm")} •{" "}
+                              {p.artist_name}
                               {timeLabel && (
-                                <Text span fw={700} ml="sm" c={isLive ? "red" : "gray"}>
+                                <Text
+                                  span
+                                  fw={700}
+                                  ml="sm"
+                                  c={isLive ? "red" : "gray"}
+                                >
                                   {timeLabel}
                                 </Text>
                               )}
                             </Text>
 
                             <Tooltip
-                              label={isFavorite ? "Verwijder uit schema" : "Voeg toe aan schema"}
+                              label={
+                                isFavorite
+                                  ? "Verwijder uit schema"
+                                  : "Voeg toe aan schema"
+                              }
                               onClick={(e) => e.stopPropagation()}
                             >
                               <ActionIcon

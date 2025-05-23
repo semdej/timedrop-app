@@ -27,7 +27,9 @@ export default async function PerformancePage({
 
   const { data: performance } = await supabase
     .from("performances")
-    .select("id, artist_name, start_time, end_time, songs(title, start_time, end_time)")
+    .select(
+      "id, artist_name, start_time, end_time, songs(title, start_time, end_time)"
+    )
     .eq("id", params.id)
     .single();
 
@@ -39,8 +41,8 @@ export default async function PerformancePage({
   return (
     <>
       <Navbar />
-      <Container>
-      <Box p="md">
+      <Container size="lg" py="xl">
+        <Box p="md">
           <Stack gap="md">
             <BackButton />
             <Title order={2}>{performance.artist_name}</Title>

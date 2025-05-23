@@ -45,7 +45,7 @@ export default async function FestivalPage({ params }: Props) {
   return (
     <>
       <Navbar />
-      <Container>
+      <Container size="lg" py="xl">
         <Box p="md">
           <Stack gap="md">
             <BackButton />
