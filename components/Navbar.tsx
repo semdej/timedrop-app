@@ -24,17 +24,35 @@ export function Navbar() {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
     useDisclosure(false);
   const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null); // ✅ Role state
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
   const router = useRouter();
 
   useEffect(() => {
-    const getSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      setUser(data?.session?.user ?? null);
+    const getSessionAndProfile = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+
+      if (currentUser) {
+        const { data: profile, error } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", currentUser.id)
+          .single();
+
+        if (!error) {
+          setRole(profile.role); // ✅ Set role
+        }
+      }
+
       setLoading(false);
     };
-    getSession();
+
+    getSessionAndProfile();
   }, []);
 
   const handleLogout = async () => {
@@ -66,6 +84,17 @@ export function Navbar() {
                       >
                         Account
                       </Menu.Item>
+
+                      {role === "admin" && ( // ✅ Admin tab condition
+                        <Menu.Item
+                          component={Link}
+                          href="/admin"
+                          leftSection={<FiUser size={16} />}
+                        >
+                          Admin
+                        </Menu.Item>
+                      )}
+
                       <Menu.Item
                         color="red"
                         onClick={handleLogout}
@@ -142,6 +171,15 @@ export function Navbar() {
           <Link href="/dashboard" className={classes.link}>
             Dashboard
           </Link>
+
+          {role === "admin" && ( // ✅ Admin drawer link
+            <>
+              <Divider my="sm" />
+              <Link href="/admin" className={classes.link}>
+                Admin
+              </Link>
+            </>
+          )}
 
           <Divider my="sm" />
 
