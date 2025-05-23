@@ -19,12 +19,13 @@ import classes from "./Navbar.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FiUser, FiLogIn, FiLogOut, FiSettings } from "react-icons/fi";
+import type { User } from "@supabase/supabase-js"; // <-- Add this import
 
 export function Navbar() {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
     useDisclosure(false);
-  const [user, setUser] = useState(null);
-  const [role, setRole] = useState(null); // ✅ Role state
+  const [user, setUser] = useState<User | null>(null); // <-- Add type
+  const [role, setRole] = useState<string | null>(null); // <-- Add type
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
   const router = useRouter();
@@ -44,15 +45,20 @@ export function Navbar() {
           .eq("id", currentUser.id)
           .single();
 
-        if (!error) {
+        if (!error && profile) {
           setRole(profile.role); // ✅ Set role
+        } else {
+          setRole(null);
         }
+      } else {
+        setRole(null);
       }
 
       setLoading(false);
     };
 
     getSessionAndProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleLogout = async () => {
@@ -85,7 +91,7 @@ export function Navbar() {
                         Account
                       </Menu.Item>
 
-                      {role === "admin" && ( // ✅ Admin tab condition
+                      {role === "admin" && (
                         <Menu.Item
                           component={Link}
                           href="/admin"
@@ -172,7 +178,7 @@ export function Navbar() {
             Dashboard
           </Link>
 
-          {role === "admin" && ( // ✅ Admin drawer link
+          {role === "admin" && (
             <>
               <Divider my="sm" />
               <Link href="/admin" className={classes.link}>
