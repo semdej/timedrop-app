@@ -127,7 +127,13 @@ export function ClientStageSchedule({ stages }: Props) {
   stages.forEach((stage) => {
     const datedPerformances = stage.performances.map((p) => ({
       ...p,
-      date: dayjs(p.start_time).tz("Europe/Amsterdam").format("dddd D MMMM"),
+      date: dayjs(p.start_time)
+        .tz("Europe/Amsterdam")
+        .subtract(
+          dayjs(p.start_time).tz("Europe/Amsterdam").hour() < 5 ? 1 : 0,
+          "day"
+        )
+        .format("dddd D MMMM"),
     }));
 
     const dates = Array.from(new Set(datedPerformances.map((p) => p.date)));
