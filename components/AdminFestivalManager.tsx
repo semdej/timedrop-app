@@ -187,60 +187,68 @@ function StageTable({
               </tr>
             </thead>
             <tbody>
-              {stage.performances.map((performance) => (
-                <tr key={performance.id}>
-                  <td>
-                    <TextInput
-                      defaultValue={performance.artist_name}
-                      onChange={(e) =>
-                        (performance.artist_name = e.currentTarget.value)
-                      }
-                      w="100%"
-                      size="sm"
-                    />
-                  </td>
-                  <td>
-                    <TextInput
-                      type="datetime-local"
-                      defaultValue={performance.start_time?.slice(0, 16)}
-                      onChange={(e) =>
-                        (performance.start_time = e.currentTarget.value)
-                      }
-                      w="100%"
-                      size="sm"
-                    />
-                  </td>
-                  <td>
-                    <TextInput
-                      type="datetime-local"
-                      defaultValue={performance.end_time?.slice(0, 16)}
-                      onChange={(e) =>
-                        (performance.end_time = e.currentTarget.value)
-                      }
-                      w="100%"
-                      size="sm"
-                    />
-                  </td>
-                  <td>
-                    <Group gap="xs">
-                      <ActionIcon
-                        color="blue"
-                        variant="light"
-                        onClick={() => handleUpdatePerformance(performance)}
-                      >
-                        <IconDeviceFloppy size={18} />
-                      </ActionIcon>
-                      <ActionIcon
-                        color="red"
-                        variant="light"
-                        onClick={() => handleDeletePerformance(performance.id)}
-                      >
-                        <IconTrash size={18} />
-                      </ActionIcon>
-                    </Group>
-                  </td>
-                </tr>
-              ))}
+              {[...stage.performances]
+                .sort(
+                  (a, b) =>
+                    new Date(a.start_time).getTime() -
+                    new Date(b.start_time).getTime()
+                )
+                .map((performance) => (
+                  <tr key={performance.id}>
+                    <td>
+                      <TextInput
+                        defaultValue={performance.artist_name}
+                        onChange={(e) =>
+                          (performance.artist_name = e.currentTarget.value)
+                        }
+                        w="100%"
+                        size="sm"
+                      />
+                    </td>
+                    <td>
+                      <TextInput
+                        type="datetime-local"
+                        defaultValue={performance.start_time?.slice(0, 16)}
+                        onChange={(e) =>
+                          (performance.start_time = e.currentTarget.value)
+                        }
+                        w="100%"
+                        size="sm"
+                      />
+                    </td>
+                    <td>
+                      <TextInput
+                        type="datetime-local"
+                        defaultValue={performance.end_time?.slice(0, 16)}
+                        onChange={(e) =>
+                          (performance.end_time = e.currentTarget.value)
+                        }
+                        w="100%"
+                        size="sm"
+                      />
+                    </td>
+                    <td>
+                      <Group gap="xs">
+                        <ActionIcon
+                          color="blue"
+                          variant="light"
+                          onClick={() => handleUpdatePerformance(performance)}
+                        >
+                          <IconDeviceFloppy size={18} />
+                        </ActionIcon>
+                        <ActionIcon
+                          color="red"
+                          variant="light"
+                          onClick={() =>
+                            handleDeletePerformance(performance.id)
+                          }
+                        >
+                          <IconTrash size={18} />
+                        </ActionIcon>
+                      </Group>
+                    </td>
+                  </tr>
+                ))}
               <tr>
                 <td colSpan={4}>
                   <Group wrap="wrap">

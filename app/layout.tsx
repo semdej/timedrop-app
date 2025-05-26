@@ -7,6 +7,7 @@ import {
   MantineProvider,
 } from "@mantine/core";
 import { theme } from "../theme";
+import "@mantine/dates/styles.css";
 
 export const metadata = {
   title: "TimeDrop - Development",
