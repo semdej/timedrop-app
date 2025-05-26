@@ -68,6 +68,8 @@ export function ClientStageSchedule({ stages }: Props) {
   const [filter, setFilter] = useState<
     "all" | "live" | "upcoming" | "favorites"
   >("all");
+  const [dateFilter, setDateFilter] = useState<string | null>(null);
+  const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const supabase = createClient();
@@ -139,13 +141,20 @@ export function ClientStageSchedule({ stages }: Props) {
     });
   });
 
+  useEffect(() => {
+    setAvailableDates(Object.keys(groupedByDate));
+  }, [stages]);
+
   return (
     <Box>
       <Container size="lg" py="xl">
         <SegmentedControl
           fullWidth
           value={filter}
-          onChange={(value) => setFilter(value as any)}
+          onChange={(value) => {
+            setFilter(value as any);
+            setDateFilter(null); // reset dagfilter bij wijziging
+          }}
           data={[
             { label: "Alles", value: "all" },
             { label: "Live", value: "live" },
@@ -155,112 +164,136 @@ export function ClientStageSchedule({ stages }: Props) {
         />
       </Container>
 
-      {Object.entries(groupedByDate).map(([date, stages]) => (
-        <Box key={date} mt="xl">
-          <Title order={3} mb="sm">
-            {date.charAt(0).toUpperCase() + date.slice(1)}
-          </Title>
+      {availableDates.length > 1 && (
+        <Container size="lg" pb="md">
+          <SegmentedControl
+            fullWidth
+            value={dateFilter ?? "all"}
+            onChange={(value) => setDateFilter(value === "all" ? null : value)}
+            data={[
+              { label: "Alle dagen", value: "all" },
+              ...availableDates.map((d) => ({
+                label: d.charAt(0).toUpperCase() + d.slice(1),
+                value: d,
+              })),
+            ]}
+          />
+        </Container>
+      )}
 
-          {stages.map((stage) => (
-            <Box key={stage.id} mt="md">
-              <Title order={4}>{stage.name}</Title>
-              <Stack mt="xs">
-                {stage.performances
-                  .sort(
-                    (a, b) =>
-                      new Date(a.start_time).getTime() -
-                      new Date(b.start_time).getTime()
-                  )
-                  .filter((p) => {
-                    const start = dayjs(p.start_time).tz("Europe/Amsterdam");
-                    const end = dayjs(p.end_time).tz("Europe/Amsterdam");
-                    if (filter === "live")
-                      return now.isAfter(start) && now.isBefore(end);
-                    if (filter === "upcoming") return now.isBefore(start);
-                    if (filter === "favorites")
-                      return favoriteIds.includes(p.id);
-                    return true;
-                  })
-                  .map((p) => {
-                    const start = dayjs(p.start_time).tz("Europe/Amsterdam");
-                    const end = dayjs(p.end_time).tz("Europe/Amsterdam");
-                    const isLive = now.isAfter(start) && now.isBefore(end);
-                    const isUpcoming = now.isBefore(start);
-                    const isFavorite = favoriteIds.includes(p.id);
+      {Object.entries(groupedByDate)
+        .filter(([date]) => !dateFilter || date === dateFilter)
+        .sort(
+          ([a], [b]) =>
+            dayjs(a, "dddd D MMMM", "nl").toDate().getTime() -
+            dayjs(b, "dddd D MMMM", "nl").toDate().getTime()
+        )
+        .map(([date, stages]) => (
+          <Box key={date} mt="xl">
+            <Title order={3} mb="sm">
+              {date.charAt(0).toUpperCase() + date.slice(1)}
+            </Title>
 
-                    let timeLabel = "";
-                    if (isLive) timeLabel = "NU LIVE";
-                    else if (isUpcoming)
-                      timeLabel = `Straks (${now.to(start, true)})`;
+            {stages.map((stage) => (
+              <Box key={stage.id} mt="md">
+                <Title order={4}>{stage.name}</Title>
+                <Stack mt="xs">
+                  {stage.performances
+                    .sort(
+                      (a, b) =>
+                        new Date(a.start_time).getTime() -
+                        new Date(b.start_time).getTime()
+                    )
+                    .filter((p) => {
+                      const start = dayjs(p.start_time).tz("Europe/Amsterdam");
+                      const end = dayjs(p.end_time).tz("Europe/Amsterdam");
+                      if (filter === "live")
+                        return now.isAfter(start) && now.isBefore(end);
+                      if (filter === "upcoming") return now.isBefore(start);
+                      if (filter === "favorites")
+                        return favoriteIds.includes(p.id);
+                      return true;
+                    })
+                    .map((p) => {
+                      const start = dayjs(p.start_time).tz("Europe/Amsterdam");
+                      const end = dayjs(p.end_time).tz("Europe/Amsterdam");
+                      const isLive = now.isAfter(start) && now.isBefore(end);
+                      const isUpcoming = now.isBefore(start);
+                      const isFavorite = favoriteIds.includes(p.id);
 
-                    return (
-                      <Link
-                        key={p.id}
-                        href={`/performance/${p.id}`}
-                        style={{ textDecoration: "none", color: "black" }}
-                      >
-                        <Paper
-                          p="sm"
-                          radius="md"
-                          withBorder
-                          bg={
-                            isLive
-                              ? "blue.1"
-                              : isUpcoming
-                                ? "gray.0"
-                                : "transparent"
-                          }
-                          shadow={isLive ? "sm" : "none"}
-                          style={{ cursor: "pointer" }}
+                      let timeLabel = "";
+                      if (isLive) timeLabel = "NU LIVE";
+                      else if (isUpcoming && start.diff(now, "hour", true) <= 1)
+                        timeLabel = `Straks (${now.to(start, true)})`;
+
+                      return (
+                        <Link
+                          key={p.id}
+                          href={`/performance/${p.id}`}
+                          style={{ textDecoration: "none", color: "black" }}
                         >
-                          <Group justify="space-between">
-                            <Text fw={500} c={isLive ? "blue.9" : undefined}>
-                              {start.format("HH:mm")} – {end.format("HH:mm")} •{" "}
-                              {p.artist_name}
-                              {timeLabel && (
-                                <Text
-                                  span
-                                  fw={700}
-                                  ml="sm"
-                                  c={isLive ? "red" : "gray"}
-                                >
-                                  {timeLabel}
-                                </Text>
-                              )}
-                            </Text>
-
-                            <Tooltip
-                              label={
-                                isFavorite
-                                  ? "Verwijder uit schema"
-                                  : "Voeg toe aan schema"
-                              }
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <ActionIcon
-                                variant="subtle"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  toggleFavorite(p.id);
-                                }}
-                              >
-                                {isFavorite ? (
-                                  <IconStarFilled size={20} color="gold" />
-                                ) : (
-                                  <IconStar size={20} />
+                          <Paper
+                            p="sm"
+                            radius="md"
+                            withBorder
+                            bg={
+                              isLive
+                                ? "blue.1"
+                                : isUpcoming
+                                  ? "gray.0"
+                                  : "transparent"
+                            }
+                            shadow={isLive ? "sm" : "none"}
+                            style={{ cursor: "pointer" }}
+                          >
+                            <Group justify="space-between">
+                              <Text fw={500} c={isLive ? "blue.9" : undefined}>
+                                {start.format("HH:mm")} – {end.format("HH:mm")}{" "}
+                                • {p.artist_name}
+                                {timeLabel && (
+                                  <Text
+                                    span
+                                    fw={700}
+                                    ml="sm"
+                                    c={isLive ? "red" : "gray"}
+                                  >
+                                    {timeLabel}
+                                  </Text>
                                 )}
-                              </ActionIcon>
-                            </Tooltip>
-                          </Group>
-                        </Paper>
-                      </Link>
-                    );
-                  })}
-              </Stack>
-            </Box>
-          ))}
-        </Box>
-      ))}
+                              </Text>
+
+                              <Tooltip
+                                label={
+                                  isFavorite
+                                    ? "Verwijder uit schema"
+                                    : "Voeg toe aan schema"
+                                }
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <ActionIcon
+                                  variant="subtle"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    toggleFavorite(p.id);
+                                  }}
+                                >
+                                  {isFavorite ? (
+                                    <IconStarFilled size={20} color="gold" />
+                                  ) : (
+                                    <IconStar size={20} />
+                                  )}
+                                </ActionIcon>
+                              </Tooltip>
+                            </Group>
+                          </Paper>
+                        </Link>
+                      );
+                    })}
+                </Stack>
+              </Box>
+            ))}
+          </Box>
+        ))}
     </Box>
   );
 }
