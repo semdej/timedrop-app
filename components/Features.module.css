@@ -1,0 +1,25 @@
+.background {
+  background-color: var(--mantine-color-blue-light);
+  width: 100%;
+}
+
+.wrapper {
+  text-align: center;
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+
+.title {
+  font-size: 36px;
+  font-family: Outfit, sans-serif;
+}
+
+.highlight {
+  background: linear-gradient(
+    to right,
+    var(--mantine-color-blue-6),
+    var(--mantine-color-cyan-6)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

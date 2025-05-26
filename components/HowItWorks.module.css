@@ -1,0 +1,27 @@
+.title {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.steps {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.step {
+  flex: 1;
+  min-width: 150px;
+}
+
+.iconWrapper {
+  background-color: var(--mantine-color-blue-light);
+  color: var(--mantine-color-blue-9);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
