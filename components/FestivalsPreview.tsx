@@ -17,7 +17,7 @@ export async function FestivalsPreview() {
     .from("festivals")
     .select("id, name, location, start_date, end_date, logourl, slug")
     .order("start_date", { ascending: true })
-    .limit(6);
+    .limit(3);
 
   if (error) {
     console.error("Error fetching festivals:", error.message);
