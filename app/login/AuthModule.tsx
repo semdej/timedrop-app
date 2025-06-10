@@ -21,6 +21,16 @@ import classes from "./Auth.module.css";
 // Import the Google icon from react-icons/fc (Flat Color Icons)
 import { FcGoogle } from 'react-icons/fc';
 
+// Define the type for the result from signup action for type assertion
+interface SignupResultForAuthModule {
+  success: boolean;
+  error?: string;
+  result?: {
+    user: any | null; // Using 'any' here for simplicity if full Supabase User type is not directly available or causes issues
+    session: any | null; // Using 'any' here for simplicity
+  };
+}
+
 
 export function AuthModule() {
   const [isLogin, setIsLogin] = useState(true);
@@ -43,12 +53,22 @@ export function AuthModule() {
       if (result?.error) {
         setError(result.error);
       } else {
-        // Redirect only if there's no error and it's not an email confirmation flow (for signup)
-        if (result?.success && !(result.result?.user && !result.result?.session)) {
-          window.location.href = isLogin ? "/dashboard" : "/";
-        } else if (result?.success && result.result?.user && !result.result?.session) {
-          // Handle email confirmation for signup (Supabase's default behavior)
-          setError("Please check your email to confirm your account.");
+        // Handle redirect based on whether it's login or signup
+        if (isLogin) {
+          // For login, if successful, redirect to dashboard
+          if (result?.success) {
+            window.location.href = "/dashboard";
+          }
+        } else {
+          // For signup, check for email confirmation flow
+          // Use type assertion here to explicitly tell TypeScript that 'result' is SignupResultForAuthModule
+          const signupResult = result as SignupResultForAuthModule; 
+          if (signupResult?.success && signupResult.result?.user && !signupResult.result?.session) {
+            setError("Please check your email to confirm your account.");
+          } else if (signupResult?.success) {
+            // For signup without email confirmation, or if session exists, redirect to home
+            window.location.href = "/";
+          }
         }
       }
     } catch (err) {
@@ -88,12 +108,6 @@ export function AuthModule() {
   
 
   return (
-    // The Fragment <> </> is necessary here because there's only one root element
-    // and the previous code had two root elements implicitly if not wrapped.
-    // However, looking at the previous input, `Container` was already the direct child
-    // of `return`, so the outer `<></>` might be redundant if `Container` is the sole root.
-    // Keeping it here for safety, but if your previous code compiled without it,
-    // you can remove it.
     <>
     <Container size={420} my={40}>
       <Title ta="center" className={classes.title}>
