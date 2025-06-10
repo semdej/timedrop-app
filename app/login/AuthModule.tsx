@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
   Anchor,
+  Alert,
   Button,
   Checkbox,
   Container,
@@ -19,21 +20,33 @@ import classes from "./Auth.module.css";
 export function AuthModule() {
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
+  
     const formData = new FormData(e.currentTarget);
-
     const action = isLogin ? login : signup;
-    const result = await action(formData);
-
-    if (result?.error) {
-      setError(result.error);
-    } else {
-      // Only redirect on success (or use router.push if needed)
-      window.location.href = isLogin ? "/dashboard" : "/";
+  
+    try {
+      const result = await action(formData);
+      console.log("Result from action:", result);
+  
+      if (result?.error) {
+        setError(result.error);
+      } else {
+        window.location.href = isLogin ? "/dashboard" : "/";
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
+  
 
   return (
     <Container size={420} my={40}>
@@ -45,14 +58,26 @@ export function AuthModule() {
         {isLogin ? (
           <>
             Do not have an account yet?{" "}
-            <Anchor component="button" onClick={() => setIsLogin(false)}>
+            <Anchor
+              component="button"
+              onClick={() => {
+                setIsLogin(false);
+                setError(null);
+              }}
+            >
               Create account
             </Anchor>
           </>
         ) : (
           <>
             Already have an account?{" "}
-            <Anchor component="button" onClick={() => setIsLogin(true)}>
+            <Anchor
+              component="button"
+              onClick={() => {
+                setIsLogin(true);
+                setError(null);
+              }}
+            >
               Log in
             </Anchor>
           </>
@@ -80,12 +105,14 @@ export function AuthModule() {
           <Group justify="space-between" mt="lg">
             <Checkbox label="Remember me" />
           </Group>
+
           {error && (
-            <Text color="red" mt="sm" size="sm">
+            <Alert color="red" mt="sm" title="Error">
               {error}
-            </Text>
+            </Alert>
           )}
-          <Button type="submit" fullWidth mt="xl" radius="md">
+
+          <Button type="submit" fullWidth mt="xl" radius="md" loading={loading}>
             {isLogin ? "Sign in" : "Sign up"}
           </Button>
         </form>
