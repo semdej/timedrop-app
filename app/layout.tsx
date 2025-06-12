@@ -10,7 +10,7 @@ import { theme } from "../theme";
 import "@mantine/dates/styles.css";
 
 export const metadata = {
-  title: "TimeDrop - Development",
+  title: "TimeDrop - Timetable & Lineup Tracking",
   description: "Timetable & Lineup Tracking",
 };
 
