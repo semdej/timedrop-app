@@ -48,7 +48,7 @@ export function FestiCard({
             flexDirection: isMobile ? "column" : "row",
           }}
         >
-          <Stack flex={1} spacing="xs">
+          <Stack flex={1}>
             <Badge>{daysLeft} days left</Badge>
             <Text fz="lg" fw={500}>
               {title}
