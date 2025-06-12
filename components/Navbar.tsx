@@ -173,7 +173,9 @@ export function Navbar() {
       >
         <ScrollArea h="calc(100vh - 80px)" mx="-md">
           <Divider my="sm" />
-
+          <Link href="/" className={classes.link}>
+            Home
+          </Link>
           <Link href="/dashboard" className={classes.link}>
             Dashboard
           </Link>
