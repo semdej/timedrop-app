@@ -19,7 +19,7 @@ import {
 import { login, signup, signInWithGoogle } from "./actions";
 import classes from "./Auth.module.css";
 // Import the Google icon from react-icons/fc (Flat Color Icons)
-import { FcGoogle } from 'react-icons/fc';
+import { FcGoogle } from "react-icons/fc";
 
 // Define the type for the result from signup action for type assertion
 interface SignupResultForAuthModule {
@@ -31,7 +31,6 @@ interface SignupResultForAuthModule {
   };
 }
 
-
 export function AuthModule() {
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,14 +41,14 @@ export function AuthModule() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-  
+
     const formData = new FormData(e.currentTarget);
     const action = isLogin ? login : signup;
-  
+
     try {
       const result = await action(formData);
       console.log("Result from action:", result);
-  
+
       if (result?.error) {
         setError(result.error);
       } else {
@@ -62,8 +61,12 @@ export function AuthModule() {
         } else {
           // For signup, check for email confirmation flow
           // Use type assertion here to explicitly tell TypeScript that 'result' is SignupResultForAuthModule
-          const signupResult = result as SignupResultForAuthModule; 
-          if (signupResult?.success && signupResult.result?.user && !signupResult.result?.session) {
+          const signupResult = result as SignupResultForAuthModule;
+          if (
+            signupResult?.success &&
+            signupResult.result?.user &&
+            !signupResult.result?.session
+          ) {
             setError("Please check your email to confirm your account.");
           } else if (signupResult?.success) {
             // For signup without email confirmation, or if session exists, redirect to home
@@ -78,7 +81,6 @@ export function AuthModule() {
       setLoading(false);
     }
   };
-  
 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
@@ -87,12 +89,15 @@ export function AuthModule() {
       const result = await signInWithGoogle();
       if (result?.error) {
         setError(result.error);
-      } else if (result?.data?.url) { // Check if a URL is returned from the server action
+      } else if (result?.data?.url) {
+        // Check if a URL is returned from the server action
         // Explicitly redirect the user to the OAuth provider's URL
         window.location.href = result.data.url;
       } else {
         // Fallback for unexpected successful response without a URL
-        console.warn("Google sign-in action succeeded but no redirect URL was provided.");
+        console.warn(
+          "Google sign-in action succeeded but no redirect URL was provided."
+        );
         setError("Something went wrong with Google sign-in. Please try again.");
       }
     } catch (err) {
@@ -105,92 +110,104 @@ export function AuthModule() {
       setGoogleLoading(false);
     }
   };
-  
 
   return (
     <>
-    <Container size={420} my={40}>
-      <Title ta="center" className={classes.title}>
-        {isLogin ? "Welcome back!" : "Create your account"}
-      </Title>
+      <Container size={420} my={40}>
+        <Title ta="center" className={classes.title}>
+          {isLogin ? "Welcome back!" : "Create your account"}
+        </Title>
 
-      <Text className={classes.subtitle}>
-        {isLogin ? (
-          <>
-            Do not have an account yet?{" "}
-            <Anchor
-              component="button"
-              onClick={() => {
-                setIsLogin(false);
-                setError(null);
-              }}
-            >
-              Create account
-            </Anchor>
-          </>
-        ) : (
-          <>
-            Already have an account?{" "}
-            <Anchor
-              component="button"
-              onClick={() => {
-                setIsLogin(true);
-                setError(null);
-              }}
-            >
-              Log in
-            </Anchor>
-          </>
-        )}
-      </Text>
-
-      <Paper withBorder shadow="sm" p={22} mt={30} radius="md">
-        <Button
-          fullWidth
-          variant="default"
-          // Use the imported FcGoogle component directly
-          leftSection={<FcGoogle style={{ fontSize: rem(20) }} />}
-          onClick={handleGoogleSignIn}
-          loading={googleLoading}
-        >
-          Sign in with Google
-        </Button>
-
-        <Divider label="Or continue with email" labelPosition="center" my="lg" />
-
-        <form onSubmit={handleSubmit}>
-          <TextInput
-            label="Email"
-            name="email"
-            placeholder="you@timedrop.nl"
-            required
-            radius="md"
-            type="email"
-          />
-          <PasswordInput
-            label="Password"
-            name="password"
-            placeholder="Your password"
-            required
-            mt="md"
-            radius="md"
-          />
-          <Group justify="space-between" mt="lg">
-            <Checkbox label="Remember me" />
-          </Group>
-
-          {error && (
-            <Alert color="red" mt="sm" title="Error">
-              {error}
-            </Alert>
+        <Text className={classes.subtitle}>
+          {isLogin ? (
+            <>
+              Do not have an account yet?{" "}
+              <Anchor
+                component="button"
+                onClick={() => {
+                  setIsLogin(false);
+                  setError(null);
+                }}
+              >
+                Create account
+              </Anchor>
+            </>
+          ) : (
+            <>
+              Already have an account?{" "}
+              <Anchor
+                component="button"
+                onClick={() => {
+                  setIsLogin(true);
+                  setError(null);
+                }}
+              >
+                Log in
+              </Anchor>
+            </>
           )}
+        </Text>
 
-          <Button type="submit" fullWidth mt="xl" radius="md" loading={loading}>
-            {isLogin ? "Sign in" : "Sign up"}
+        <Paper withBorder shadow="sm" p={22} mt={30} radius="md">
+          <Button
+            fullWidth
+            variant="default"
+            // Use the imported FcGoogle component directly
+            leftSection={<FcGoogle style={{ fontSize: rem(20) }} />}
+            onClick={handleGoogleSignIn}
+            loading={googleLoading}
+          >
+            Sign in with Google
           </Button>
-        </form>
-      </Paper>
-    </Container>
+
+          <Divider
+            label="Or continue with email"
+            labelPosition="center"
+            my="lg"
+          />
+
+          <form onSubmit={handleSubmit}>
+            <TextInput
+              label="Email"
+              name="email"
+              placeholder="you@timedrop.nl"
+              required
+              radius="md"
+              type="email"
+              disabled
+            />
+            <PasswordInput
+              label="Password"
+              name="password"
+              placeholder="Your password"
+              required
+              mt="md"
+              radius="md"
+              disabled
+            />
+            <Group justify="space-between" mt="lg">
+              <Checkbox label="Remember me" />
+            </Group>
+
+            {error && (
+              <Alert color="red" mt="sm" title="Error">
+                {error}
+              </Alert>
+            )}
+
+            <Button
+              type="submit"
+              fullWidth
+              mt="xl"
+              radius="md"
+              loading={loading}
+              disabled
+            >
+              {isLogin ? "Sign in" : "Sign up"}
+            </Button>
+          </form>
+        </Paper>
+      </Container>
     </>
   );
 }
