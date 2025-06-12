@@ -1,12 +1,22 @@
-import { Badge, Box, Card, Group, Image, Stack, Text } from "@mantine/core";
+import {
+  Badge,
+  Box,
+  Card,
+  Group,
+  Image,
+  Stack,
+  Text,
+  useMantineTheme,
+} from "@mantine/core";
 import Link from "next/link";
+import { useMediaQuery } from "@mantine/hooks";
 
 type FestiCardProps = {
   title: string;
   description: string;
   daysLeft: number;
   logourl: string;
-  slug: string; // Unique identifier for route
+  slug: string;
 };
 
 export function FestiCard({
@@ -16,6 +26,9 @@ export function FestiCard({
   logourl,
   slug,
 }: FestiCardProps) {
+  const theme = useMantineTheme();
+  const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm})`);
+
   return (
     <Link href={`/festivals/${slug}`} style={{ textDecoration: "none" }}>
       <Card
@@ -26,8 +39,16 @@ export function FestiCard({
         component="div"
         style={{ cursor: "pointer" }}
       >
-        <Group justify="space-between" align="flex-start" wrap="nowrap">
-          <Stack flex={1}>
+        <Group
+          justify="space-between"
+          align="flex-start"
+          wrap="nowrap"
+          gap="md"
+          style={{
+            flexDirection: isMobile ? "column" : "row",
+          }}
+        >
+          <Stack flex={1} spacing="xs">
             <Badge>{daysLeft} days left</Badge>
             <Text fz="lg" fw={500}>
               {title}
@@ -37,12 +58,17 @@ export function FestiCard({
             </Text>
           </Stack>
 
-          <Box style={{ alignSelf: "flex-start" }}>
+          <Box
+            style={{
+              alignSelf: isMobile ? "center" : "flex-start",
+              marginTop: isMobile ? theme.spacing.md : 0,
+            }}
+          >
             <Image
               src={logourl}
               alt="Festival Image"
-              height={120}
-              width={120}
+              height={isMobile ? 100 : 120}
+              width={isMobile ? 100 : 120}
               fit="contain"
               radius="md"
             />

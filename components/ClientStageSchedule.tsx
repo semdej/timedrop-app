@@ -153,13 +153,13 @@ export function ClientStageSchedule({ stages }: Props) {
 
   return (
     <Box>
-      <Container size="lg" py="xl">
+      <Container size="md" px={{ base: "sm", sm: "md" }} py="xl">
         <SegmentedControl
           fullWidth
           value={filter}
           onChange={(value) => {
             setFilter(value as any);
-            setDateFilter(null); // reset dagfilter bij wijziging
+            setDateFilter(null);
           }}
           data={[
             { label: "Alles", value: "all" },
@@ -171,7 +171,7 @@ export function ClientStageSchedule({ stages }: Props) {
       </Container>
 
       {availableDates.length > 1 && (
-        <Container size="lg" pb="md">
+        <Container size="md" px={{ base: "sm", sm: "md" }} pb="md">
           <SegmentedControl
             fullWidth
             value={dateFilter ?? "all"}
@@ -195,7 +195,7 @@ export function ClientStageSchedule({ stages }: Props) {
             dayjs(b, "dddd D MMMM", "nl").toDate().getTime()
         )
         .map(([date, stages]) => (
-          <Box key={date} mt="xl">
+          <Box key={date} mt="xl" px={{ base: "sm", sm: "md" }}>
             <Title order={3} mb="sm">
               {date.charAt(0).toUpperCase() + date.slice(1)}
             </Title>
@@ -252,21 +252,36 @@ export function ClientStageSchedule({ stages }: Props) {
                             shadow={isLive ? "sm" : "none"}
                             style={{ cursor: "pointer" }}
                           >
-                            <Group justify="space-between">
-                              <Text fw={500} c={isLive ? "blue.9" : undefined}>
-                                {start.format("HH:mm")} – {end.format("HH:mm")}{" "}
-                                • {p.artist_name}
-                                {timeLabel && (
-                                  <Text
-                                    span
-                                    fw={700}
-                                    ml="sm"
-                                    c={isLive ? "red" : "gray"}
-                                  >
-                                    {timeLabel}
+                            <Group
+                              justify="space-between"
+                              wrap="wrap"
+                              gap="xs"
+                              align="center"
+                              style={{ rowGap: 8 }}
+                            >
+                              <Stack gap={4} maw="100%">
+                                <Text
+                                  fw={500}
+                                  size="sm"
+                                  c={isLive ? "blue.9" : undefined}
+                                >
+                                  {start.format("HH:mm")} –{" "}
+                                  {end.format("HH:mm")} •{" "}
+                                  <Text span inherit fw={600}>
+                                    {p.artist_name}
                                   </Text>
-                                )}
-                              </Text>
+                                  {timeLabel && (
+                                    <Text
+                                      span
+                                      fw={700}
+                                      ml="sm"
+                                      c={isLive ? "red" : "gray"}
+                                    >
+                                      {timeLabel}
+                                    </Text>
+                                  )}
+                                </Text>
+                              </Stack>
 
                               <Tooltip
                                 label={
