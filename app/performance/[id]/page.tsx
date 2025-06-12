@@ -3,7 +3,12 @@ import { BackButton } from "@/components/BackButton";
 import { createClient } from "@/utils/supabase/server";
 import { Box, Container, Divider, Stack, Text, Title } from "@mantine/core";
 import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import { notFound } from "next/navigation";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 type PageProps = {
   params: Promise<{
@@ -30,8 +35,8 @@ export default async function PerformancePage(props: PageProps) {
 
   if (!performance) return notFound();
 
-  const start = dayjs(performance.start_time);
-  const end = dayjs(performance.end_time);
+  const start = dayjs(performance.start_time).tz("Europe/Amsterdam");
+  const end = dayjs(performance.end_time).tz("Europe/Amsterdam");
 
   return (
     <>
@@ -72,8 +77,13 @@ export default async function PerformancePage(props: PageProps) {
                         <Text fw={500}>• {song.title}</Text>
                         {song.start_time && song.end_time && (
                           <Text size="sm" c="dimmed">
-                            {dayjs(song.start_time).format("HH:mm")} –{" "}
-                            {dayjs(song.end_time).format("HH:mm")}
+                            {dayjs(song.start_time)
+                              .tz("Europe/Amsterdam")
+                              .format("HH:mm")}{" "}
+                            –{" "}
+                            {dayjs(song.end_time)
+                              .tz("Europe/Amsterdam")
+                              .format("HH:mm")}
                           </Text>
                         )}
                       </Box>
