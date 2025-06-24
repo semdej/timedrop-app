@@ -174,7 +174,7 @@ export function AuthModule() {
               required
               radius="md"
               type="email"
-              disabled
+              
             />
             <PasswordInput
               label="Password"
@@ -183,7 +183,7 @@ export function AuthModule() {
               required
               mt="md"
               radius="md"
-              disabled
+              
             />
             <Group justify="space-between" mt="lg">
               <Checkbox label="Remember me" />
@@ -201,7 +201,7 @@ export function AuthModule() {
               mt="xl"
               radius="md"
               loading={loading}
-              disabled
+            
             >
               {isLogin ? "Sign in" : "Sign up"}
             </Button>
